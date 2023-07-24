@@ -13,7 +13,7 @@ h: help
 
 # ----- COMBOS -----
 
-clean: stop-robotshop stop-sockshop stop-lakeside clean-dmon-image
+clean: stop-robotshop stop-sockshop stop-lakeside clean-dmon-image clean-wgen clean-flow clean-docker
 .PHONY: clean # rm, combo :: clean all
 
 rm: clean
@@ -29,21 +29,27 @@ cd: build-dmon
 
 build-dmon-image:
 	$(call _echo,building dmon docker image)
-	# $(MAKE) -C $(dmon) clean genimage
+	$(MAKE) -C $(dmon) genimage
 .PHONY: build-dmon-image # cid, build dmon docker image
 
 cid: build-dmon-image
 
+.ONESHELL:
 build-wgen:
 	$(call _echo,compiling wgen binary)
-	# $(MAKE) -C $(wgen) clean install
+	cd $(wgen)
+	docker run --rm -v "$(shell pwd)/$(wgen)":/usr/src/myapp -w /usr/src/myapp golang:latest sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make build"
+	mv -f wgen $$HOME/.local/bin
 .PHONY: build-wgen # cw, compile wgen binary
 
 cw: build-wgen
 
+.ONESHELL:
 build-flow:
 	$(call _echo,compiling flow binary)
-	# $(MAKE) -C $(flow) clean install
+	cd $(flow)
+	docker run --rm -v "$(shell pwd)/$(flow)":/usr/src/myapp -w /usr/src/myapp golang:latest sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make build"
+	mv -f flow $$HOME/.local/bin
 .PHONY: build-flow # cf, compile flow binary
 
 cf: build-flow
@@ -59,21 +65,21 @@ rmd: clean-dmon
 
 clean-dmon-image:
 	$(call _echo,deleting dmon docker image)
-	# -$(MAKE) -C $(dmon) delimage
+	-$(MAKE) -C $(dmon) delimage
 .PHONY: clean-dmon # rmid, delete dmon docker image
 
 rmid: clean-dmon-image
 
 clean-wgen:
 	$(call _echo,removing wgen binary)
-	# $(MAKE) -C $(wgen) clean
+	rm -f $$HOME/.local/bin/wgen
 .PHONY: clean-wgen # rmw, remove wgen binary
 
 rmw: clean-wgen
 
 clean-flow:
 	$(call _echo,removing flow binary)
-	# $(MAKE) -C $(flow) clean
+	rm -f $$HOME/.local/bin/flow
 .PHONY: clean-flow # rmf, remove flow binary
 
 rmf: clean-flow
