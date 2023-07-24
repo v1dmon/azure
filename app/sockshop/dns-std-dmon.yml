@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+  dmon:
+    image: v1dmon/dmon:latest
+    hostname: dmon
+    restart: always
+    network_mode: host
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command: ${DMON_ARGS:--i sockshop -n sockshop -t 5s -r localhost -p 6379}
+    depends_on:
+      - front-end
