@@ -38,7 +38,7 @@ cid: build-dmon-image
 build-wgen:
 	$(call _echo,compiling wgen binary)
 	cd $(wgen)
-	docker run --rm -v "$(shell pwd)/$(wgen)":/usr/src/myapp -w /usr/src/myapp golang:latest sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make build"
+	docker run --rm -v "$(shell pwd)/$(wgen)":/usr/src/myapp -w /usr/src/myapp golang:latest sh -c "git config --global --add safe.directory /usr/src/myapp && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make build"
 	mv -f wgen $$HOME/.local/bin
 .PHONY: build-wgen # cw, compile wgen binary
 
@@ -48,7 +48,7 @@ cw: build-wgen
 build-flow:
 	$(call _echo,compiling flow binary)
 	cd $(flow)
-	docker run --rm -v "$(shell pwd)/$(flow)":/usr/src/myapp -w /usr/src/myapp golang:latest sh -c "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make build"
+	docker run --rm -v "$(shell pwd)/$(flow)":/usr/src/myapp -w /usr/src/myapp golang:latest sh -c "git config --global --add safe.directory /usr/src/myapp && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make build"
 	mv -f flow $$HOME/.local/bin
 .PHONY: build-flow # cf, compile flow binary
 
@@ -66,7 +66,7 @@ rmd: clean-dmon
 clean-dmon-image:
 	$(call _echo,deleting dmon docker image)
 	-$(MAKE) -C $(dmon) delimage
-.PHONY: clean-dmon # rmid, delete dmon docker image
+.PHONY: clean-dmon-image # rmid, delete dmon docker image
 
 rmid: clean-dmon-image
 
